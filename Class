@@ -1,0 +1,502 @@
+//Class
+//日期时间类
+//Date and time 转换为毫秒，千分之一秒来统一计算，一直到Wed Dec 31 18:00:00 CST 1969
+System.out.println(System.currentTimeMillis()); //1586012270463 Long类型
+
+	private static void date02() {
+        //Date(long date) 将毫秒值转换为日期
+        Date date = new Date(0);
+        System.out.println(date);
+    }
+
+    private static void date01() {
+        Date date = new Date();
+        System.out.println(date);
+    }
+
+Date date = new Date();
+System.out.println(date.getTime()); //1586015182912
+System.out.println(System.currentTimeMillis()); //1586015182912 same thing 
+date01(); //Sat Apr 04 10:46:22 CDT 2020
+date02(); //Wed Dec 31 18:00:00 CST 1969
+
+//Date Format / abstract class / public class SimpleDateFormat extends DateFormat
+//允许进行格式化（日期 -> 文本）、解析（文本 -> 日期）和规范化
+//y M d H m s
+//年月日时分秒
+//e.g., yyyy年MM月dd日 HH:mm:ss
+import java.text.SimpleDateFormat;
+import java.util.Date;
+//格式化
+SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
+System.out.println(dateFormat.format(new Date())); //2020年04月04日 11:05:58
+//解析 parse方法定义了一个throw Exception
+public static void main(String[] args) throws ParseException { //声明抛出异常
+	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
+    System.out.println(dateFormat.parse("2020年04月04日 11:05:58")); //parse定义了类型不一致的异常抛出
+    dateFormat.parse("123"); //Exception in thread "main" java.text.ParseException: Unparseable date: "123"
+}
+
+//Calendar类（抽象类）操作日历字段
+Calendar cal = Calendar.getInstance(); //定义了获取子类对象的方法
+System.out.println(cal); //java.util.GregorianCalendar[time=1586031648628,areFieldsSet=true,areAllFieldsSet=true,lenient=true,zone=sun.util.calendar.ZoneInfo[id="America/Chicago"...
+//get方法，给定日历段，返回代表的值
+System.out.println(cal.get(Calendar.YEAR)); //2020
+System.out.println(cal.get(Calendar.MONTH) + 1); //月份0-11, 4
+System.out.println(cal.get(Calendar.DAY_OF_MONTH)); //4
+//set方法，给给定日历段设定数值
+cal.set(Calendar.YEAR, 9999); //设置年为9999
+System.out.println(cal.get(Calendar.YEAR)); //9999
+cal.set(9999, 8, 8); //同时设置年月日
+//add方法，为指定的日历段增加或者减少数值，+/-
+cal.add(Calendar.YEAR, -20);
+System.out.println(cal.get(Calendar.YEAR)); //9979
+//public Date getTime() 日历对象转换为Date对象
+System.out.println(cal.getTime()); //Sat Sep 08 15:48:02 CDT 9979
+//================================================================
+
+//System类，包含大量的获取与系统相关信息或者操作的方法
+System.out.println(System.currentTimeMillis()); //1586033591537
+public static void main(String[] args) {
+	long start = System.currentTimeMillis();
+	int a = 0;
+    for (int i = 0; i < 999999; i++) {
+        a += i;
+    }
+	long end = System.currentTimeMills();
+	System.out.println(end - start); //5
+}
+//static void arraycopy(Object src, int srcPos, Object dest, int destPos, int length)
+int[] src = {1, 2, 3, 4, 5};
+int[] dest = {3, 3, 5, 6, 9};
+System.arraycopy(src, 0, dest, 0, 3); //原数组前三个复制到目标数值前三个位置
+System.out.println(Arrays.toString(src)); //[1, 2, 3, 4, 5]
+System.out.println(Arrays.toString(dest)); //[1, 2, 3, 6, 9]
+
+//java.lang.StringBuilder
+//字符串底层是private final byte[] value
+//字符串缓冲区底层没有被final修饰 byte[] value = new byte[16]; 超过容量会自动扩容
+StringBuilder strbu = new StringBuilder();
+strbu.append("cass").append(8).append(true).append("中"); //append return this，可以实现链式编程
+System.out.println(strbu); //cass8true中
+//StringBuilder和String转换
+//String to StringBuilder
+StringBuilder strb1 = new StringBuilder("cass");
+//StringBuilder to String
+String str = strbu.toString();
+System.out.println(str); //cass8true中
+
+//包装类
+//包装基本类型数据，并定义方法来操作这些数据
+//装箱
+Integer in1 = new Integer(1); //包装int 1成一个类
+Integer in2 = in1.valueOf(1); //也是包装类int 1
+//拆箱
+int i = in1.intValue(); //1
+//自动拆箱与装箱
+Integer in = 1;
+in = in + 2; //自动拆箱再自动装箱
+ArrayList<Integer> list = new ArrayList<>();
+list.add(1); //list.add(Integer e)自动装箱
+int a = list.get(0); //自动拆箱，返回Integer，拆箱成为int
+//基本类型->字符串
+int i1 = 100;
+String s1 = i1 + "";
+String s2 = Integer.toString(100); //"100"
+String s3 = String.valueOf(100);
+//字符串->基本类型
+int i2 = Integer.parseInt(s2);
+
+//java.util.Collection，单列集合的接口 contains List and Set
+Collection<String> coll = new ArrayList<>();
+coll.add("Cass");
+coll.add("Dean");
+System.out.println(coll); //[Cass, Dean]
+System.out.println(coll.contains("Cass")); //true
+System.out.println(coll.isEmpty()); //false
+System.out.println(coll.size()); //2
+Object[] arr = coll.toArray();
+System.out.println(arr[0]); //Cass
+coll.remove("Cass");
+coll.clear(); //清空元素不删除集合 []
+
+//java.util.Iterator迭代器 通用的取出集合中元素的方式，常用方法hasNext(),next()
+//迭代器先有实现类对象，再指向-1索引，一直向后
+public class IteratorTest {
+    public static void main(String[] args) {
+        Collection<String> coll = new ArrayList<>();
+        coll.add("Sam");
+        coll.add("Dean");
+        coll.add("lucy");
+        coll.add("mary");
+        Iterator<String> ite = coll.iterator(); //多态，coll.iterator()生成Iterator子类
+        while (ite.hasNext()) {
+            String str = ite.next(); //逐一取出
+            System.out.println(str); 
+        }
+    }
+}
+
+//增强for循环foreach，也是使用的迭代器，简化
+int[] array = {1,2,3};
+for (int i : array) {
+	System.out.println(i); 
+}
+
+//泛型，不知道什么元素
+ArrayList<E e> //E element 随意，M/N/S都行
+//定义集合不适用泛型 ArrayList list = new ArrayList<>(); 默认Object类，容易引发异常，无法使用子类方法，需要向下转型，CastException
+//避免类型转换，运行期异常提升至编译期
+//含有泛型的类
+public class GenericClass<E> {
+    private E name;
+
+    public void setName(E name) {
+        this.name = name;
+    }
+
+    public E getName() {
+        return name;
+    }
+
+    public GenericClass(E name) {
+        this.name = name;
+    }
+}
+public class GTest {
+    public static void main(String[] args) {
+        GenericClass<Integer> gc = new GenericClass<>(123); 
+        System.out.println(gc.getName());
+    }
+}
+//含有泛型的方法
+public <E> void method(E e) {
+	System.out.println(e);
+}
+method(1); //传递什么，使用什么
+method("cass");
+//含有泛型的接口
+public interface GeneInter<E> {
+	public abstract void method(E e);
+}
+public class InterClass implements GeneInter<String> {
+    @Override
+    public void method(String str) {      
+    }
+}
+public class InterClass<E> implements GeneInter<E> { //实现类也可以用泛型，与接口一致
+    @Override
+    public void method(E e) {
+    }
+}
+//泛型通配符 ? 定义的时候不能用，只能接收数据
+ArrayList<?> list
+public static void printArray(ArrayList<?> list) {
+	Iterator<?> ite = list.iterator();
+}
+//泛型上下限限定
+public static void getE(Collection<? extends Number> coll) {} //上限，只能是NM类型或者子类，Integer extends Number
+public static void getE(Collection<? super Number> coll) {} // 下限，只能是NM类型或者父类
+
+//斗地主发牌
+public class GTest {
+    public static void main(String[] args) {
+        //准备牌 定义集合
+        ArrayList<String> poker = new ArrayList<>();
+        String[] colors = {"黑桃", "红桃", "方片", "梅花"};
+        String[] numbers = {"2", "A", "K", "Q", "J", "10", "9", "8", "7", "6", "5", "4", "3"};
+        //大王小王
+        poker.add("大王");
+        poker.add("小王");
+        for (String number : numbers) {
+            for (String color : colors) {
+                poker.add(color + number);
+            }
+        }
+        //System.out.println(poker);
+
+        //洗牌
+        Collections.shuffle(poker);
+        //System.out.println(poker);
+
+        //发牌 %3 0,1,2
+        ArrayList<String> player1 = new ArrayList<>();
+        ArrayList<String> player2 = new ArrayList<>();
+        ArrayList<String> player3 = new ArrayList<>();
+        ArrayList<String> base = new ArrayList<>();
+        for (int i = 0; i < poker.size(); i++) {
+            String p = poker.get(i);
+            if (i >= 51) {
+                base.add(p);
+            } else if(i%3 == 0) {
+                player1.add(p);
+            } else if(i%3 == 1) {
+                player2.add(p);
+            } else {
+                player3.add(p);
+            }
+        }
+
+        //看牌
+        System.out.println("Player1: " + player1); //Player1: [梅花9, 黑桃6, 梅花K, 红桃8, 方片2, 方片J, 黑桃J, 黑桃3, 方片5, 方片9, 方片Q, 方片7, 梅花5, 黑桃9, 黑桃A, 方片6, 红桃K]
+        System.out.println("Player2: " + player2); //Player2: [梅花A, 红桃4, 红桃A, 方片A, 黑桃2, 黑桃4, 梅花8, 小王, 大王, 黑桃8, 黑桃7, 梅花3, 黑桃Q, 黑桃5, 梅花Q, 方片8, 方片4]
+        System.out.println("Player3: " + player3); //Player3: [黑桃10, 红桃10, 方片K, 梅花4, 红桃7, 红桃5, 红桃3, 梅花J, 梅花2, 红桃J, 红桃6, 红桃9, 方片3, 红桃2, 黑桃K, 红桃Q, 梅花10]
+        System.out.println("Base: " + base); //Base: [梅花7, 梅花6, 方片10]
+
+    }
+}
+
+//java.util.List 底层是数组结构，查询快，增删慢
+List<String> list = new ArrayList<>();
+list.add("Cass");
+list.add(0, "Dean");
+System.out.println(list); //[Dean, Cass]
+String str = list.remove(0);
+String str = list.set(0, "SAM"); //Cass
+sout; //[SAM, Cass]
+//SAM 小心越界异常
+//java.util.LinkedList 底层是链表结构，查询慢，增删快，大量操作首尾节点的方法
+LinkedList<String> list = new LinkedList<>();
+list.add("Cass");
+list.add("Dean");
+list.get(0); 
+System.out.println(list); //[Cass, Dean]
+list.addFirst("First"); //[First, Cass, Dean]
+list.push("add"); //[add, First, Cass, Dean]
+list.addLast("Last"); //[add, First, Cass, Dean, Last]
+System.out.println(list.getFirst()); //add getLast():Last
+//removeFirst();removeLast() return removed element
+list.pop(); //[First, Cass, Dean, Last]
+
+//Set 不包含重复元素，无索引
+//HashSet 底层是一个Hash表结构
+public class SetTest {
+    public static void main(String[] args) {
+        Set<Integer> set = new HashSet<>();
+        set.add(12);
+        set.add(15);
+        set.add(15);
+        Iterator<Integer> ite = set.iterator();
+        while(ite.hasNext()) {
+            System.out.println(ite.next()); //12 15 重复15变为一个
+        }
+		for(int i : set) {
+            System.out.println(i); //same thing
+
+        }
+    }
+}
+//无序，存入12，15，13，16 -> [16, 12, 13, 15]
+
+//哈希值Object类给出，十进制整数，逻辑地址，不是物理地址
+Person p1 = new Person();
+int h1 = p1.hashCode();
+//判断重复元素，调用哈希值和equals方法
+//存储自定义类型元素 重写hashCode, equals方法
+HashSet<Person> hashp = new HashSet<>();
+hashp.add(new Person("Cass", 20));
+hashp.add(new Person("Cass", 20));
+System.out.println(hashp);
+@Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return age == person.age &&
+                Objects.equals(name, person.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, age);
+    }
+	
+//hash basic code
+public static int hash(Object... values) {
+    return Arrays.hashCode(values);
+}
+public static int hashCode(Object a[]) {    
+	if (a == null)        
+		return 0;    
+	int result = 1;    
+	for (Object element : a) {       
+		result = 31 * result + (element == null ? 0 : element.hashCode()); 
+	}		
+	return result;
+}
+
+//LinkedHashSet 多了一条链表记录存储顺序，有序的
+LinkedHashSet<String> strings = new LinkedHashSet<>();
+strings.add("cass");
+strings.add("sam");
+strings.add("cass");
+strings.add("001");
+strings.add("www");
+strings.add("zenith");
+System.out.println(strings); //[cass, sam, 001, www, zenith]
+
+//可变参数 JDK1.5+ 参数数据类型确定但是个数不确定 （数据类型...变量名） 底层-数组 多种参数，可变参数只能有一个并写在末尾
+private static int add(int...array) {
+        int sum = 0;
+        for (int i = 0; i < array.length; i++) {
+            sum += array[i];
+        }
+        return sum;
+    }
+	
+int sum = add(10, 20, 30, 40); //100
+
+//Collections集合工具
+Collections.suffle(list);
+Collections.sort(list); //升序，只能传递LIST，不能SET，对于自定义类，需要重写compareTo方法
+public class Person implements Comparable<Person> //类中定义比较方法实现可比性
+public int compareTo(Person p) {
+	return this.getAge() - p.getAge();
+}
+
+Collections.addAll(list, "cass", "dean", "sam", "more");
+ArrayList<Integer> list = new ArrayList<>();
+        Collections.addAll(list, 1,2,3,4,5);
+        Collections.sort(list, new Comparator<Integer>() { //使用比较器，定义第三方裁判介入
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return o2 - o1;
+            }
+        });
+System.out.println(list); //[5, 4, 3, 2, 1]
+ArrayList<Person> listp = new ArrayList<>();
+        Collections.addAll(listp, new Person("Cass",19), new Person("Dean",8));
+        Collections.sort(listp, new Comparator<Person>() { //Comparator对自定义类
+            @Override
+            public int compare(Person o1, Person o2) {
+                return o1.getAge() - o2.getAge(); //升序
+            }
+        });
+        System.out.println(listp);  //[Person{name='Dean', age=8}, Person{name='Cass', age=19}]
+		
+//Map Key+Value 
+//HashMap 无序,存和取的顺序不一样，自己排序（数组+单向链表） 允许存取null LinkedHashMap有序
+Map<String, String> map = new HashMap<>();
+Map<Integer, String> map = new HashMap<>();
+map.put(1, "cass"); //key不重复，put并返回null，重复，替换value并返回被替换的value
+map.put(1, "Dean"); //Value可以重复
+map.put(2, "sam");
+map.put(3, "lucy");
+System.out.println(map);
+String removed = map.remove(1); //通过key删除，返回删除的value
+System.out.println(map.get(2)); //通过key来获取value，key不存在则返回null
+map.containsKey(2); //true
+map.containsValue("lucky"); //false
+//Map遍历 Set<E> key 获取每一个key
+Set<Integer> sets= map.keySet();
+for (int i : sets) {
+	System.out.println(map.get(i));
+}
+//Set(Map.Entry<K,V>)
+Set<Map.Entry<Integer, String>> sets2 = map.entrySet();
+for (Map.Entry<Integer, String> entry : sets2) {
+	System.out.println(entry.getKey() + " " + entry.getValue());
+}
+//LinkedHashMap 有序的，存和取的顺序一致
+
+//HashTable JDK1.0 不允许存取null（前面的其他集合都行）
+HashMap<String, String> maps = new HashMap<>();
+maps.put(null, null);
+maps.put("cass", null);
+maps.put(null, "dean");
+sout(maps); //{null=dean, cass=null}
+
+//HashMap case
+private static Map<Character, Integer> CharNumber(String str) {
+        if (str == null) return null;
+        char[] array = str.toCharArray();
+        Map<Character, Integer> map = new HashMap<>();
+        for (int i = 0; i < array.length; i++) {
+            if (map.get(array[i])==null) {
+                map.put(array[i], 1);
+            } else {
+                map.put(array[i], map.get(array[i]) + 1);
+            }
+        }
+        return map;
+    }
+	
+System.out.println(CharNumber("String str")); //{ =1, r=2, S=1, s=1, t=2, g=1, i=1, n=1}
+
+//斗地主 Order Version 54  -> 17*3 + 3
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+public class DouDiZhu {
+    public static void main(String[] args) {
+        //1.准备牌
+        HashMap<Integer,String> poker = new HashMap<>();
+        ArrayList<Integer> pokerIndex = new ArrayList<>();
+        List<String> colors = List.of("♠", "♥", "♣", "♦");
+        List<String> numbers = List.of("2", "A", "K", "Q", "J", "10", "9", "8", "7", "6", "5", "4", "3");
+        //把大王和小王存储到集合中
+        int index = 0;
+        poker.put(index,"大王"); //0
+        pokerIndex.add(index);
+        index++;
+        poker.put(index,"小王"); //1
+        pokerIndex.add(index);
+        index++;
+        for (String number : numbers) { //先按数字排序
+            for (String color : colors) {
+                poker.put(index,color+number);
+                pokerIndex.add(index);
+                index++;
+            }
+        }
+
+        //2.洗牌
+        Collections.shuffle(pokerIndex);
+
+        //3.发牌
+        ArrayList<Integer> player01 = new ArrayList<>();
+        ArrayList<Integer> player02 = new ArrayList<>();
+        ArrayList<Integer> player03 = new ArrayList<>();
+        ArrayList<Integer> diPai = new ArrayList<>();
+        //遍历存储牌索引的List集合,获取每一个牌的索引
+        for (int i = 0; i <pokerIndex.size() ; i++) {
+            Integer in = pokerIndex.get(i);
+            //先判断底牌
+            if(i>=51){
+                diPai.add(in);
+            }else if(i%3==0){
+                player01.add(in);
+            }else if(i%3==1){
+                player02.add(in);
+            }else if(i%3==2){
+                player03.add(in);
+            }
+        }
+
+       //4.排序 使用Collections.sort(List) 默认升序
+        Collections.sort(player01);
+        Collections.sort(player02);
+        Collections.sort(player03);
+        Collections.sort(diPai);
+
+
+        //5.看牌
+
+        lookPoker("player1",poker,player01);
+        lookPoker("player2",poker,player02);
+        lookPoker("player3",poker,player03);
+        lookPoker("base",poker,diPai);
+    }
+
+    public static void lookPoker(String name,HashMap<Integer,String> poker,ArrayList<Integer> list){
+        System.out.print(name + ": ");
+        for (Integer key : list) {
+            String card = poker.get(key);
+            System.out.print(card + " ");
+        }
+        System.out.println();//打印完每一个玩家的牌,换行
+    }
+
+}	
