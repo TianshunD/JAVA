@@ -32,7 +32,7 @@ int b = r.nextInt(3); //3（bound），choose from 0,1,2
 public class GuessNumber {
     public static void main(String[] args) {
         int a = new Random().nextInt(100);
-		Scanner sca = new Scanner(System.in);
+		Scanner sca = new Scanner(System.in); 
 		while (true) {
 			System.out.println("pls type in your guess number:");
 			int b = sca.nextInt();
