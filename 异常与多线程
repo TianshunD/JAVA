@@ -40,7 +40,7 @@ Error:错误
 OutOfMemoryError: Java heap space
 */
 int[] arr = new int[1024*1024*1024]; //Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
-//必须修改代码,创建的数组小一点
+//必须修改代码,创建的数组小一点 
 int[] arr = new int[1024*1024];
 
 //异常处理，JVM根据异常创建一个类（内容，原因，位置），抛出给方法的调用者main方法
