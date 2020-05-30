@@ -1,0 +1,481 @@
+//选中，Ctrl+Shift+/区块注释
+//函数式接口 有且只有一个抽象方法
+@FunctionalInterface
+public interface MyFunctionalInterface {
+    public abstract void method();
+}
+
+public class MyMain {
+    public static void main(String[] args) {
+        show(new MyFunctionalInterface() { //匿名内部类会加载.class文件
+            @Override
+            public void method() {
+                System.out.println("Hello!");
+            }
+        });
+        show(() -> System.out.println("hello")); //Lambda不会加载.class文件，效率更高
+    }
+    public static void show(MyFunctionalInterface mi) {
+        mi.method();
+    }
+}
+
+//=====================================================================================
+//函数式编程
+//函数式接口作为方法的参数
+public static void main(String[] args) {
+        String str1 = "Hello ";
+        String str2 = "world ";
+        String str3 = "!";
+        show(2,str1+str2+str3); //不会打印，但会拼接，性能浪费
+    }
+	private static void show(int level, String message) {
+        if (level == 1) {
+            System.out.println(message);
+        }
+    }
+
+//避免性能浪费	
+@FunctionalInterface
+public interface MessageBuilder {
+    public abstract String messageBuild();
+}
+
+public static void main(String[] args) {
+        String str1 = "Hello ";
+        String str2 = "world ";
+        String str3 = "!";
+        showLog(2, () -> {
+            return str1+str2+str3; //满足条件才会拼接
+        });
+    }
+
+    public static void showLog(int level, MessageBuilder mb) {
+        if (level == 1) {
+            System.out.println(mb.messageBuild());
+        }
+    }
+
+//使用Lambda开启多线程	
+public static void main(String[] args) {
+        startThread(() -> System.out.println(Thread.currentThread().getName() + "启动了"));
+    }
+
+    private static void startThread(Runnable run) {
+        new Thread(run).start();
+    }
+	
+//函数式接口作为方法的返回值
+public static void main(String[] args) {
+        String[] strings = {"aaa","bb","dddd"};
+        System.out.println(Arrays.toString(strings));
+
+        Arrays.sort(strings,getComparator());
+        System.out.println(Arrays.toString(strings));
+    }
+
+    private static Comparator<String> getComparator() {
+        return (o1, o2) -> o1.length() - o2.length();
+    }
+	
+//常用的函数式接口 java.util.function
+//Supplier 生产型接口
+public static void main(String[] args) {
+        System.out.println(getString(()->"cass"));
+    }
+
+    private static String getString(Supplier<String> sup) {
+        return sup.get();
+    }
+
+//getMax	
+public static void main(String[] args) {
+        int[] array = {4,89,32,90,9};
+        System.out.println(getMax(()->{
+            int max = array[0];
+            for (int i : array) {
+                if (max < i) max = i;
+            }
+            return max;
+        }));;
+    }
+
+    private static int getMax(Supplier<Integer> sup) {
+        return sup.get();
+    }
+	
+//Consumer
+public static void main(String[] args) {
+        consumerMethod("cass", (String name)->{
+            //use this input
+            StringBuilder rName = new StringBuilder(name);
+            name = rName.reverse().toString();
+            System.out.println(name);
+        });
+    }
+
+    private static void consumerMethod(String name, Consumer<String> con) {
+        con.accept(name);
+    }
+	
+//Consumer方法andThen
+public static void main(String[] args) {
+        consumerMethod("cass",(name) -> System.out.println(name.toLowerCase()),
+                (name) -> System.out.println(name.toUpperCase()));
+    }
+    private static void consumerMethod(String name, Consumer<String> con1, Consumer<String> con2) {
+        con1.andThen(con2).accept(name); //先用name执行con1，再用name执行con2，可以more
+    }
+	
+	//打印姓名年龄
+    public static void main(String[] args) {
+        String[] arrays = {"cass,19", "dean,20", "sam,18"};
+        for (String array : arrays) {
+            consumerMethod(array, (mes)->{
+                System.out.print("Name: " + mes.split(",")[0] + "; ");
+            }, (mes)->{
+                System.out.print("Age: " + mes.split(",")[1] + ".");
+                System.out.println();
+            });
+        }
+    }
+    private static void consumerMethod(String name, Consumer<String> con1, Consumer<String> con2) {
+        con1.andThen(con2).accept(name);
+    }
+	/*Name: cass; Age: 19.
+	Name: dean; Age: 20.
+	Name: sam; Age: 18.*/
+
+//Predicate	
+public static boolean checkString(String s, Predicate<String> pre){
+        return pre.test(s);
+    }
+
+    public static void main(String[] args) {
+        //定义一个字符串
+        String s = "abcdef";
+
+        //调用checkString方法对字符串进行校验,参数传递字符串和Lambda表达式
+        /*boolean b = checkString(s,(String str)->{
+            //对参数传递的字符串进行判断,判断字符串的长度是否大于5,并把判断的结果返回
+            return str.length()>5;
+        });*/
+
+        //优化Lambda表达式
+        boolean b = checkString(s,str->str.length()>5);
+        System.out.println(b);
+    }
+
+//Predicate and	
+public static void main(String[] args) {
+        boolean res = test("cass",(src)->src.length()>0,(src)->src.contains("a"));
+        System.out.println(res); //true
+    }
+
+    private static boolean test(String src, Predicate<String> pre1, Predicate<String> pre2) {
+        return pre1.and(pre2).test(src);
+    }
+
+    private static void consumerMethod(String name, Consumer<String> con1, Consumer<String> con2) {
+        con1.andThen(con2).accept(name);
+    }
+	
+//Predicate or
+public static void main(String[] args) {
+        boolean res = test("cass",(src)->src.length()>5,(src)->src.contains("a"));
+        System.out.println(res); //true
+    }
+
+    private static boolean test(String src, Predicate<String> pre1, Predicate<String> pre2) {
+        return pre1.or(pre2).test(src);
+    }
+
+    private static void consumerMethod(String name, Consumer<String> con1, Consumer<String> con2) {
+        con1.andThen(con2).accept(name);
+    }
+	
+//Predicate negate
+public static void main(String[] args) {
+        boolean res = test("cass",(src)->src.length()>5);
+        System.out.println(res); //true
+    }
+
+    private static boolean test(String src, Predicate<String> pre1) {
+        return pre1.negate().test(src);
+    }
+
+//Predicate case	
+public static ArrayList<String> filter(String[] arr,Predicate<String> pre1,Predicate<String> pre2){
+        ArrayList<String> list = new ArrayList<>();
+        for (String str : arr) {
+            boolean b = pre1.and(pre2).test(str);
+            if(b){
+                list.add(str);
+            }
+        }
+        return list;
+    }
+
+    public static void main(String[] args) {
+        String[] array = { "cass,20", "dean,20", "mary,21", "lucy,22" };
+        ArrayList<String> list = filter(array,(String s)->{
+           return s.split(",")[1].equals("20");
+        },(String s)->{
+           return s.split(",")[0].length()==4;
+        });
+        System.out.println(list);
+    }
+	
+	public static void main(String[] args) {
+        String[] arrays = {"cass,18","dean,20","sam,20"};
+        ArrayList<String> list = new ArrayList<>();
+        for (String array : arrays) {
+            if (test(array, (src) -> src.split(",")[0].length() == 4, (src) -> src.split(",")[1].equals("20")))
+                list.add(array);
+        }
+        System.out.println(list);
+    }
+
+    private static boolean test(String src, Predicate<String> pre1, Predicate<String> pre2) {
+        return pre1.and(pre2).test(src);
+    }
+
+//Function 类型转换	
+public static void change(String s, Function<String,Integer> fun){
+        //Integer in = fun.apply(s);
+        int in = fun.apply(s);//自动拆箱 Integer->int
+        System.out.println(in);
+    }
+
+    public static void main(String[] args) {
+        String s = "1234";
+        change(s,(String str)->{
+            //把字符串类型的整数,转换为Integer类型的整数返回
+            return Integer.parseInt(str);
+        });
+        change(s,str->Integer.parseInt(str)); //优化Lambda
+    }
+	
+//流式编程
+public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+        Collections.addAll(list,"cass","dean","sam","lucy","deng TS");
+        list.stream()
+                .filter(name -> name.startsWith("d")) //filter(Predicate)
+                .filter(name -> name.length() == 4)
+                .forEach(name -> System.out.println(name)); //forEach(Consumer)
+    }
+	
+//Lambda延迟执行特性 提高程序效率
+list.stream() //Stream并不存储数据，只是按需计算
+                .filter(name -> name.startsWith("d"))
+                .filter(name -> name.length() == 4); //没有输出，先不执行
+				
+list.stream()
+                .filter(name -> name.startsWith("d")) 
+                .filter(name -> name.length() == 4)
+                .forEach(name -> System.out.println(name)); //此时执行	
+
+//两种获取流的方式	
+	public static void main(String[] args) {
+        //单列集合转换为Stream流
+        List<String> list = new ArrayList<>();
+        Stream<String> stream = list.stream();
+
+        Set<String> set = new HashSet<>();
+        Stream<String> stream1 = set.stream();
+
+        Map<String, String> map = new HashMap<>();
+        Set<String> keySet = map.keySet();
+        Stream<String> stream2 = keySet.stream();
+        Collection<String> values = map.values();
+        Stream<String> stream3 = values.stream();
+        Set<Map.Entry<String, String>> entries = map.entrySet();
+        Stream<Map.Entry<String, String>> stream4 = entries.stream();
+
+        //把数组转换为Stream流
+        Stream<Integer> stream6 = Stream.of(1, 2, 3, 4, 5);
+        //可变参数可以传递数组
+        Integer[] arr = {1,2,3,4,5};
+        Stream<Integer> stream7 = Stream.of(arr);
+        String[] arr2 = {"a","bb","ccc"};
+        Stream<String> stream8 = Stream.of(arr2);
+    }	
+
+//Stream流两个终结方法count forEach返回不是Stream流	
+public static void main(String[] args) {
+        Stream<String> stream = Stream.of("cass", "dean", "lucy", "more");
+        stream.forEach(name -> System.out.println(name));
+    }
+	
+public static void main(String[] args) {
+        Stream<String> stream = Stream.of("cass", "dean", "lucy", "more");
+        Stream<String> stream2 = stream.filter((String name) -> {return name.startsWith("c");});
+        stream2.forEach(name -> System.out.println(name));
+    }
+	
+//Stream流被消费一次就会关闭，返回一个新的Stream流
+Stream<String> stream = Stream.of("cass", "dean", "lucy", "more");
+Stream<String> stream2 = stream.filter((String name) -> {return name.startsWith("c");});
+stream2.forEach(name -> System.out.println(name));
+stream.forEach(name -> System.out.println(name)); //Exception in thread "main" java.lang.IllegalStateException: stream 
+//has already been operated upon or closed
+
+//Stream_map 映射
+public static void main(String[] args) {
+        Stream<String> stream = Stream.of("1", "2", "3", "4");
+        Stream<Integer> integerStream = stream.map((String src) -> {
+            return Integer.parseInt(src);
+        });
+        integerStream.forEach(src-> System.out.println(src));
+    }
+	
+//Stream_long count()
+public static void main(String[] args) {
+        ArrayList<Integer> list = new ArrayList<>();
+        Collections.addAll(list,1,2,3,4,5,6);
+        Stream<Integer> stream = list.stream();
+        long count = stream.count(); //返回long类型整数
+        System.out.println(count);
+    }
+
+//Stream_limit	
+public static void main(String[] args) {
+        String[] array = {"cass", "dean", "sam", "lucy"};
+        Stream<String> stream = Stream.of(array);
+        stream.limit(3).forEach(name -> System.out.println(name));
+    }
+	
+//Stream_skip(long n) 元素大于n，跳过前n个，否则返回0元素的Stream
+public static void main(String[] args) {
+        String[] array = {"cass", "dean", "sam", "lucy"};
+        Stream<String> stream = Stream.of(array);
+        stream.skip(3).forEach(name -> System.out.println(name)); //lucy
+    }
+
+//Stream_concat 拼接	
+public static void main(String[] args) {
+        Stream<Integer> integerStream = Stream.of(1, 2, 3, 5, 6, 7);
+        Stream<Integer> integerStream1 = Stream.of(8, 9, 10, 11, 12);
+        Stream<Integer> concat = Stream.concat(integerStream, integerStream1);
+        concat.forEach(num -> System.out.println(num));
+    }
+
+//集合操作
+public static void main(String[] args) {
+        ArrayList<String> list1 = new ArrayList<>();
+        Collections.addAll(list1,"cass","dean","sam","deng");
+        Stream<String> stream1 = list1.stream();
+        Stream<String> con1 = stream1.filter(name -> name.length() == 3).limit(3);
+
+        ArrayList<String> list2 = new ArrayList<>();
+        Collections.addAll(list2, "lucy","morgan","sandy");
+        Stream<String> stream2 = list2.stream();
+        Stream<String> con2 = stream2.skip(2).filter(name -> name.length()>2);
+
+        Stream.concat(con1, con2).map(name -> new Person(name)).forEach(person -> System.out.println(person));
+    }
+//Person{name='sam'}
+//Person{name='sandy'}
+
+//====================================================================================
+//方法引用 对Lambda的优化
+@FunctionalInterface
+public interface Printable {
+    public abstract void print(String s);
+}
+
+public class PrintCase {
+    public static void main(String[] args) {
+        printString(s -> System.out.println(s));
+    }
+
+    private static void printString(Printable pri) {
+        pri.print("Hello");
+    }
+}
+
+public static void main(String[] args) {
+        printString(System.out::println); //方法引用表达式： 已经存在的对象::已经存在的方法，参数可以省略，但一定要是方法可以接收的类型
+    }
+	
+//通过对象名引用成员方法
+public class ClassReMethod {
+    void printUpperCase(String str) {
+        System.out.println(str.toUpperCase());
+    }
+}
+public class PrintCase {
+    public static void main(String[] args) {
+        printString(s -> {
+            ClassReMethod obj = new ClassReMethod();
+            obj.printUpperCase(s);
+        });
+        ClassReMethod obj = new ClassReMethod();
+        printString(obj::printUpperCase);
+    }
+    private static void printString(Printable pri) {
+        pri.print("Hello");
+    }
+}
+
+//通过类名引用静态成员方法
+int absNumber = method(int number, Math::abs);
+
+//通过super引用父类成员方法
+public class Man extends Human{
+    //子类重写父类sayHello的方法
+    @Override
+    public void sayHello() {
+        System.out.println("Hello 我是Man!");
+    }
+
+    //定义一个方法参数传递Greetable接口
+    public void method(Greetable g){
+        g.greet();
+    }
+
+    public void show(){
+        //调用method方法,方法的参数Greetable是一个函数式接口,所以可以传递Lambda
+        /*method(()->{
+            //创建父类Human对象
+            Human h = new Human();
+            //调用父类的sayHello方法
+            h.sayHello();
+        });*/
+
+        //因为有子父类关系,所以存在的一个关键字super,代表父类,所以可以直接使用super调用父类的成员方法
+       /* method(()->{
+            super.sayHello();
+        });*/
+
+      /*
+           使用super引用类的成员方法
+           super是已经存在的
+           super成员方法sayHello也是已经存在的
+           直接使用super引用父类的成员方法
+       */
+      method(super::sayHello);
+    }
+
+//通过this引用本类成员方法
+method(this::sayHello);
+
+//类的构造器引用
+@FunctionalInterface
+public interface PersonBuiler {
+    public abstract Person buildPerson(String name);
+}
+
+public static void main(String[] args) {
+        build("cass", name -> new Person(name));
+        build("dean", Person::new); //用Person引用new
+    }
+
+    private static void build(String name, PersonBuiler pb) {
+        Person p = pb.buildPerson(name);
+        System.out.println(p.getName());
+    }
+	
+//数组的构造器引用
+int[] array = build(10, int[]::new);

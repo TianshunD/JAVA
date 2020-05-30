@@ -57,7 +57,7 @@ System.out.println(cal.getTime()); //Sat Sep 08 15:48:02 CDT 9979
 
 //System类，包含大量的获取与系统相关信息或者操作的方法
 System.out.println(System.currentTimeMillis()); //1586033591537
-public static void main(String[] args) { 
+public static void main(String[] args) {
 	long start = System.currentTimeMillis();
 	int a = 0;
     for (int i = 0; i < 999999; i++) {

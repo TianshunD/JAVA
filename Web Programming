@@ -1,0 +1,225 @@
+/*网络通信协议
+UDB 无连接通信协议 无连接特性，传输快，可能丢失资源
+TPC 面向连接的通信协议 三次握手 数据安全
+查看本机IP cmd -ipconfig
+端口号 2个字节 0-65535 warning 1024之前的不能用，已经被分配给已知网络软件
+通信协议，IP + 端口号，就指定发送至对方电脑的软件
+*/
+/*Client/Server
+建立连接包含一个字节流IO对象传输数据
+*/
+java.net.Socket
+/*
+    构造方法:
+        Socket(String host, int port) 创建一个流套接字并将其连接到指定主机上的指定端口号。
+        参数:
+            String host:服务器主机的名称/服务器的IP地址
+            int port:服务器的端口号
+
+    成员方法:
+        OutputStream getOutputStream() 返回此套接字的输出流。
+        InputStream getInputStream() 返回此套接字的输入流。
+        void close() 关闭此套接字。
+ */
+ //客户端
+ public class TCPClient {
+    public static void main(String[] args) throws IOException {
+        Socket socket = new Socket("127.0.0.1",8890); //127.0.0.1 is localhost
+        OutputStream os = socket.getOutputStream(); 
+        os.write("请求服务器接收!".getBytes());
+        InputStream is = socket.getInputStream(); 
+        byte[] bytes = new byte[1024];
+        int len = is.read(bytes);
+        System.out.println(new String(bytes,0,len));
+        socket.close();
+    }
+}
+ //服务器
+ public class TCPServer {
+    public static void main(String[] args) throws IOException {
+        ServerSocket server = new ServerSocket(8890); 
+        Socket socket = server.accept(); //using socket provided by client
+        InputStream is = socket.getInputStream(); //获取网络字节输入流
+        OutputStream os = socket.getOutputStream(); //获取网络字节输出流
+        byte[] bytes = new byte[1024];
+        int len = is.read(bytes);
+        System.out.println(new String(bytes,0,len));
+        os.write("接收到了！".getBytes());
+        socket.close();
+        server.close();
+    }
+}
+
+/*文件上传案例
+客户端/服务器和本地硬盘进行读写，需要使用自己创建的字节流对象
+客户端服务器之间读写，使用socket创建的网络字节流*/
+//阻塞 fis.read停止条件是读到结束标记，server读不到结束标记，read阻塞,死循环
+public class Client {
+    public static void main(String[] args) throws IOException {
+        Socket client = new Socket("127.0.0.1",8870);
+
+        //向服务器发送数据
+        OutputStream os = client.getOutputStream();
+        FileInputStream fis = new FileInputStream("C:\\Users\\" +
+                "10492\\Desktop\\Client\\input.txt");
+        byte[] bytes = new byte[1024];
+        int len = 0;
+        while ((len = fis.read(bytes)) != -1) {
+            os.write(bytes,0,len);
+        }
+        client.shutdownOutput(); //结束输出流标记，防止阻塞
+        System.out.println("成功发送数据到服务器！");
+
+        //读服务器回写的数据
+        InputStream is = client.getInputStream();
+        len = is.read(bytes);
+        System.out.println(new String(bytes,0,len));
+
+        //释放资源
+        fis.close();
+        client.close();
+    }
+}
+
+public class Server {
+    public static void main(String[] args) throws IOException {
+        ServerSocket server = new ServerSocket(8870);
+        while (true) { //server一直处于监听状态，可以持续上传
+            Socket socket = server.accept();
+            //设置服务器端写入位置
+            File dir = new File("C:\\Users\\10492\\Desktop\\Server");
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            String filename = "javaNet" + System.currentTimeMillis() +
+                    new Random().nextInt(999) + ".txt"; //避免同名文件被覆盖
+            FileOutputStream fos = new FileOutputStream(dir + "\\" + filename);
+
+            //读取客户端数据并写入
+            InputStream is = socket.getInputStream();
+            byte[] bytes = new byte[1024];
+            int len = 0;
+            while((len=is.read(bytes)) != -1) {
+                fos.write(bytes,0,len);
+            }
+            System.out.println("成功读取客户端数据！");
+
+            //给客户端回写
+            OutputStream os = socket.getOutputStream();
+            os.write("上传成功！".getBytes());
+
+            //释放资源
+            fos.close();
+            socket.close();
+        }
+    }
+}
+
+//Advanced
+public class Server {
+    public static void main(String[] args) throws IOException {
+        ServerSocket server = new ServerSocket(8870);
+        while (true) { //server一直处于监听状态，可以持续上传
+            Socket socket = server.accept();
+
+            new Thread(new Runnable() { //开启多线程，提升多个客户端上传效率
+                @Override
+                public void run() {
+                    try {
+                        //设置服务器端写入位置
+                        File dir = new File("C:\\Users\\10492\\Desktop\\Server");
+                        if (!dir.exists()) {
+                            dir.mkdirs();
+                        }
+                        String filename = "javaNet" + System.currentTimeMillis() +
+                                new Random().nextInt(999) + ".txt"; //避免同名文件被覆盖
+                        FileOutputStream fos = new FileOutputStream(dir + "\\" + filename);
+
+                        //读取客户端数据并写入
+                        InputStream is = socket.getInputStream();
+                        byte[] bytes = new byte[1024];
+                        int len = 0;
+                        while((len=is.read(bytes)) != -1) {
+                            fos.write(bytes,0,len);
+                        }
+                        System.out.println("成功读取客户端数据！");
+
+                        //给客户端回写
+                        OutputStream os = socket.getOutputStream();
+                        os.write("上传成功！".getBytes());
+
+                        //释放资源
+                        fos.close();
+                        socket.close();
+
+                    } catch (IOException e) {
+                        System.out.println(e);
+                    }
+                }
+            }).start();
+        }
+    }
+}
+
+//B/S
+//http://127.0.0.1:8899/ArrayListTest/web/index.html
+public static void main(String[] args) throws IOException {
+        ServerSocket server = new ServerSocket(8899);
+        Socket accept = server.accept();
+        InputStream is = accept.getInputStream();
+        byte[] bytes = new byte[1024];
+        int len = 0;
+        while ((len = is.read(bytes)) != -1) {
+            System.out.println(new String(bytes,0,len)); //第一行 GET /ArrayList/web/index.html HTTP/1.1
+        }
+    }	
+//BS代码实现
+public class BSTCPServer {
+    public static void main(String[] args) throws IOException {
+        //Server
+        ServerSocket server = new ServerSocket(8899);
+        while (true) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Socket accept = server.accept();
+                        InputStream is = accept.getInputStream();
+
+                        //get requested html path
+                        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                        String line = br.readLine(); //GET /ArrayListTest/web/index.html HTTP/1.1
+                        String[] strings = line.split(" ");
+                        String htmlPath = strings[1].substring(1); // ArrayList/web/index.html
+
+                        //System.out.println(htmlPath);
+                        //OutputStream
+                        FileInputStream fis = new FileInputStream("C:\\Users\\10492\\IdeaProjects" +
+                                "\\" + htmlPath); //for me, relative path is not working?
+                        OutputStream os = accept.getOutputStream();
+
+                        // 写入HTTP协议响应头,固定写法
+                        os.write("HTTP/1.1 200 OK\r\n".getBytes());
+                        os.write("Content-Type:text/html\r\n".getBytes());
+                        // 必须要写入空行,否则浏览器不解析
+                        os.write("\r\n".getBytes());
+
+                        //一读一写数据传输
+                        byte[] bytes = new byte[1024];
+                        int len = 0;
+                        while ((len = fis.read(bytes)) != -1) {
+                            os.write(bytes,0,len);
+                        }
+
+                        //Release stream
+                        fis.close();
+                        accept.close();
+                    } catch (IOException e) {
+                        System.out.println(e);
+                    }
+
+                }
+            }).start();
+        }
+    }
+}

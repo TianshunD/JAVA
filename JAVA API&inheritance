@@ -1,0 +1,498 @@
+//局部变量的作用域 for,while，if中定义的变量，退出{}之后，就删除
+for(int i=0;i<10;i++) {
+	int sum =3;
+}
+System.out.println(sum); //not defined.
+//JAVA API
+import java.util.Scanner;
+public class TstScanner {
+    public static void main(String[] args) {
+        System.out.println("请输入一个整数");
+        Scanner scanner = new Scanner(System.in);
+        int ats = scanner.nextInt();
+        System.out.println("接收到的整数" + ats);
+        System.out.println("请输入一串字符");
+        String str = scanner.next();
+        System.out.println("接收到的字符" + str);
+    }
+}
+
+//匿名对象，没有保存地址，只能使用一次
+new Person().getAge(); 
+int and = new Scanner(System.in).nextInt();
+
+//Random
+import java.util.Random;
+
+Random r = new Random();
+int a = r.nextInt();
+int b = r.nextInt(3); //3（bound），choose from 0,1,2
+
+//guess random number from 0 to 99;
+public class GuessNumber {
+    public static void main(String[] args) {
+        int a = new Random().nextInt(100);
+		Scanner sca = new Scanner(System.in);
+		while (true) {
+			System.out.println("pls type in your guess number:");
+			int b = sca.nextInt();
+			if (a > b) {
+				System.out.println("Too small!");
+			} else if (a < b) {
+				System.out.println("Too big!");
+			} else {
+				System.out.println("Con, you got it!");
+				break;
+			}
+		}
+    }
+}
+ 
+//ArrayList<E> 范型而非引用类型 Integer/Boolean/Short 引用基本类型的包装类（引用类型）
+import java.util.ArrayList;
+
+ArrayList<Integer> cass = new ArrayList<>();
+cass.add(100);
+cass.add(200);
+cass.remove(0); //index of， return Integer value which was removed
+cass.size();
+System.out.println(cass); //[200]
+
+ArrayList<Integer> randomlist = new ArrayList<>();
+Random ran = new Random();
+for (int i = 0; i < 6; i++) {
+	randomlist.add(1 + ran.nextInt(32)); //1~32
+}
+for (int j = 0; j < randomlist.size(); j++) {
+	System.out.println("Number " + j + " is: " + randomlist.get(j));
+}
+System.out.println(randomlist); //e.g., [29, 26, 32, 17, 2, 7]
+
+//String constructor 3+1
+public String();
+public String(char[] array);
+public String(byte[] array);
+
+String str = new String();
+char[] charArray = {'A', 'C', 'D'};
+String str2 = new String(charArray); //ABC
+
+byte[] byteArray = {97, 98, 99};
+String str3 = new String(byteArray); //abc
+
+//直接创建->用""创建的在常量池中
+String str4 = "Hello";
+
+str.charAt(0); //A
+str.connect(str2); //ABCABC
+str == str1; //false 比较引用地址
+str.equals(str1); //true比较内容
+"abc".equalsIgnoreCase(str); //true
+public String substring(int beginIndex)
+public String substring(int beginIndex, int endIndex)
+
+//字符串转换
+char[] chars = "Hello".toCharArray();
+byte[] bytes = "Hello".getBytes();
+String str = "A good day!";
+String str1 = str.replace("o", "1"); //A g11d day!
+
+//敏感词过滤
+String str = "会不会？";
+String str2 = str.replace("会不会?", "*"); //*
+
+//String Split
+String str = "aaa,bbb,ccc,ddd";
+String[] array1 = str.split(","); //["aaa", "bbb", "ccc"]
+String[] array2 = "aa.gdfgdf.fghfh".split("\\."); //.为一个特例，split参数为正则表达式。
+
+//[1, 20, 31] to String "[number1#number20#number31]"
+public static String arrayToString(int[] array) {
+	String res = "[";
+	for (int i = 0; i < array.length; i++) {
+		if (i == array.length - 1) {
+			res = res + "number" + array[i] + "]";
+		} else {
+			res = res + "number" + array[i] + "#";
+		}
+	}
+	return res;
+}
+
+//计算各种类型字符个数
+int upper = 0;
+int lower = 0;
+int number = 0;
+int other = 0;
+Scanner sc = new Scanner(System.in);
+System.out.println("Pls type in a string!");
+String input = sc.next();
+char[] charArray = input.toCharArray(); //Or use charAt()
+for (int i = 0; i < charArray.length; i++)
+{
+	if ('A'<=charArray[i] && charArray[i]<='Z') {
+		upper++;
+	} else if ('a'<=charArray[i] && charArray[i]<='z') {
+		lower++;
+	} else if ('0'<=charArray[i] && charArray[i]<='9') {
+		number++;
+	} else {
+		other++;
+	}
+}
+System.out.println("Number of upper letter is: " + upper); //Output upper letter example
+
+//Static field 该变量属于类而非对象，对象共享，可以用类名称调用；
+public class Student {
+	private String name;
+	private int age;
+	public static String classroom;
+	public Student(String name) {
+		this.name = name;	
+	}
+	//getter,setter...
+}
+Student one = new Student("Cass");
+Student two = new Student("Dean");
+one.classroom = "1003"; 
+System.out.println(one.classroom); //1003
+System.out.println(two.classroom); //1003
+System.out.println(Student.classroom);//preferred
+
+public class Student {
+	private String name;
+	private int age;
+	public static String classroom;
+	public static int idCounter = 0;
+	public Student(String name) {
+		this.name = name;
+		idCounter++;
+	}
+	//getter,setter...
+}
+Student three = new Student("Cass");
+System.out.println(three.idCounter); //1
+Student four = new Student("Dean");
+System.out.println(four.idCounter); //2
+System.out.println(three.idCounter); //2
+
+//Or automatically assign value
+public class Student {
+	public int id;
+	private String name;
+	private int age;
+	public static String classroom;
+	public static int idCounter = 0;
+	public Student(String name) {
+		this.name = name;
+		id = ++idCounter;
+	}
+	//getter,setter...
+}
+Student three = new Student("Cass"); //id = 1
+Student four = new Student("Dean"); //id = 2
+
+//静态方法(可以直接用类名调用)，成员方法（先创建对象，才能通过对象调用）
+public class MyClass {
+	public int id;
+	public void method1() {
+		System.out.println("调用成员方法");
+	}
+	public static void method2() {
+		System.out.println("调用静态方法");
+	}
+}
+Myclass class1 = new Myclass();
+class1.method1();
+Myclass.method2(); //preferred, or class1.method2();
+
+//静态不能直接访问非静态,先不知后，也不能用this（当前对象）
+public static void method2() {
+	System.out.println(id); //wrong
+}
+
+//静态代码块，第一次用到该类的时候执行，且比构造方法先执行
+public class StaticTest {
+	static {
+		System.out.println("静态代码块执行！");
+	}
+}
+
+//Arrays 
+import java.util.Arrays;
+//Array to String
+public class ArrayTest2 {
+    public static void main(String[] args) {
+        int[] array = {1, 2, 3, 4, 5};
+        System.out.println(Arrays.toString(array)); //[1, 2, 3, 4, 5]
+    }
+}
+//Sort默认升序（数值大小/字母先后）
+int[] array = {100, 53, 7, 28, 59};
+Arrays.sort(array);
+System.out.println(Arrays.toString(array)); //[7, 28, 53, 59, 100] / [aaa, bbb, ccc]
+
+//随机字符升序排列，倒序打印
+String str = "dshjhfdsjhl8778h98h";
+char[] charArray = str.toCharArray();
+Arrays.sort(charArray);
+for (int i = charArray.length - 1; i >= 0; i--) { //IDEA charArray.forr
+	System.out.print(charArray[i]);
+}
+
+//Math
+Math.abs(-12); //12 absolute value
+Math.ceil(4.2); //ceil(double) 5.0
+Math.floor(12.3); //12
+Math.round(10.4); //10 10.5->11 四舍五入
+Math.PI //3.141592653589793
+
+//继承
+//父类
+public class Father {
+}
+//子类
+public class Son extends Father {	
+}
+//e.g.,
+public class Employee {
+	public void method() {
+		int numFu = 10;
+		System.out.println("方法执行");
+	}
+}
+public class Teacher extends Employee {	
+	int numZi = 20;
+}
+
+Teacher teacher = new Teacher();
+teacher.method(); //方法执行
+teacher.numFu; //10
+teacher.numZi; //20
+//成员变量重名，优先子类,也可以通过成员方法访问
+super.num; //子类访问父类成员变量
+
+//override覆盖重写，父子类方法名称变量一致。@Override写在方法前检测是否有效覆盖重写
+//覆盖重写子类方法返回值必须小于等于父类的范围，如父类有子类也必须有 Object -> String
+public class Teacher2 extends Employee {	
+	int numZi = 20;
+	@Override
+	public void method() {
+		System.out.println("New!"); //更新设计原则，保留已有的，进行添加
+	}
+}
+
+//子类方法的权限必须大于等于父类方法权限 public > protected > (default) > private
+
+//构造方法
+public class Father {
+	public Father {
+		System.out.println("FATHER");
+	}
+}
+
+public class Son extends Father {	
+	public Son {
+		System.out.println("SON");
+	}
+}
+
+Son son = new Son(); //FATHER SON父类先执行，子类后执行，子类构造方法有个默认super();
+
+/*1.如果父类构造只有有参构造,子类构造必须定义父类构造调用的参数
+2.只有子类构造方法才能调用父类构造方法
+3.如果使用super构造调用，只能是子类构造的第一个语句，唯一一次*/
+public Father(int num) {
+	
+}
+
+public Son {
+	super(20);
+}
+
+/*super关键字，
+可以用于子类成员方法访问父类成员变量,
+或子类成员方法访问父类成员方法
+或子类构造方法访问父类构造方法,*/
+super.num
+super.method();
+
+/*this关键字，
+本类成员方法访问本类成员变量
+本类成员方法访问另一个成员方法
+在本类构造方法中访问另一个构造方法，第一个语句（唯一一次，无法多个调用）*/
+public Zi {
+	this(20);
+}
+public Zi(int num) {
+	System.out.println("Number is: " + num);
+}
+
+//JAVA继承单继承 父类只有一个
+//允许多级继承 B extends A, C extends B, A也算C的父类，不过不是直接父类
+//Java.lang.Object 所有类的父类
+
+//抽象类和抽象方法(具体内容不确定)，抽象方法一定在抽象类中，抽象类可以包含普通成员方法
+public abstract class Animal {
+	public abstract void eat();	
+}
+//抽象类对象不能直接创建，必须用子类继承，子类必须覆盖重写父类所有抽象方法（去掉abstract，补上方法体）,子类对象可以new
+public class Cat extends Animal{
+	@Override
+	public void eat() {
+		System.out.println("cat eats fish!");
+	}
+}
+Cat cat = new Cat();//父类构造，再子类构造
+//抽象方法必然在抽象类内，但是抽象类不一定包含抽象方法
+//子类如果也是抽象类，可以保留抽象方法
+
+//发红包
+public class User {
+	private String name;
+	private int money; //余额
+	public User() {		
+	}
+	public User(String name, int money) {
+		this.name = name;
+		this.money = money;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public int getMoney() {
+		return money;
+	}
+	public void setMoney(int money) {
+		this.money = money;
+	}
+	public void show() {
+		System.out.println("My name: " + name + ", My money: " + money);
+	}
+}
+//Manager
+public class Manager extends User {
+	public Manager() {		
+	}
+	public Manager(String name, int money) {
+		super(name, money);
+	}
+	public ArrayList<Integer> send(int totalMoney, int count) {
+		ArrayList<Integer> redList = new ArrayList<>();
+		int left = super.getMoney();
+		if (totalMoney > left) {
+			System.out.println("Not enough!");
+			return redList;
+		}
+		super.setMoney(left-totalMoney);
+		
+		int avg = totalMoney/count;
+		int mod = totalMoney%count；
+		
+		for(i = 0; i < count - 1; i++) {
+			redList.add(avg);
+		}
+		redList.add(avg+mod);
+		return redList;
+	}
+}
+//Member
+public class Member extends User {
+	public Member() {		
+	}
+	public Member(String name, int money) {
+		super(name, money);
+	}
+	public void receive(ArrayList<Integer> redList) {
+		int index = new Random().nextInt(redList.size());
+		int delta = redList.remove(index);
+		int money = super.getMoney();
+		super.setMoney(money + delta);
+	}
+}
+
+
+//接口：多个类的公共规范引用数据类型，编译成的字节码文件还是.class
+public interface MyInterface {
+	public abstract void methodAbs(); //接口中的抽象方法关键字必须是public abstract
+}
+//接口实现必须覆盖重写所有抽象方法（添加方法体），如果没有全部重写，必须是抽象类
+public class MyInterfaceImpl implements MyInterface {
+	@Override
+	public void methodAbs() {
+		System.out.println("Implemented!");
+	}
+}
+MyInterfaceImpl impl = new MyInterfaceImpl();
+impl.methodAbs(); //Implemented!
+//为了实现接口的更新（避免有效的实现类缺少更新后接口抽象方法的实现，添加默认方法）
+public interface MyInterface {
+	public abstract void methodAbs();
+	public default void methodDefault() {
+		System.out.println("This is a new default method!");
+	}
+}
+//接口默认方法可以被接口实现类对象调用，也可以被接口实现类覆盖重写
+@Override
+	public void methodDefault() {
+		System.out.println("实现覆盖重写！");
+	}
+	
+//JAVA8开始允许定义静态方法	
+public interface MyInterfaceStatic {
+	public static void methodStatic() {
+		System.out.println("This is a static method!");
+	}
+}
+//Warning!不能通过接口实现类的对象来调用接口的静态方法，只能通过接口名称调用
+MyInterfaceStatic.methodStatic(); //This is a static method!
+
+//JAVA9 允许定义私有方法，用于接口中的重复代码，并拒绝实现类对象访问
+//普通私有方法，解决多个默认方法的重复代码，静态私有方法，解决多个静态方法的代码重复
+public interface MyInterface {
+	public default void methodA() {
+		System.out.println("This is a static method!");
+		methodCommon();
+	}
+	public default void methodB() {
+		System.out.println("This is a static method!");
+		methodCommon();
+	}
+	private void methodCommon() {//仅供接口中默认方法调用
+		System.out.println("AAA");
+		System.out.println("BBB");
+		System.out.println("CCC");
+	}
+}
+
+//接口中定义成员变量必须使用public static final三个关键字，其实就是接口的常量
+public interface MyInterface {
+	//必须赋值，一旦赋值，不可修改(final)
+	//推荐命名规则，使用完全大写的字母，用下划线进行分割
+	public static final int NUM_CLASS = 10;
+}
+MyInterface.NUM_CLASS; //10
+
+//接口没有静态代码块和构造方法
+//一个类的直接父类唯一，但是可以实现多个接口
+public class MyClassImpl implements InterfaceA, InterfaceB {
+	//对两个接口的抽象方法进行覆盖重写
+	//若存在重名抽象方法，覆盖一次即可
+	//如果存在重复默认方法，一定要对冲突的默认方法实现覆盖重写
+	@Override
+	public void methodDefault() {
+		System.out.println("实现覆盖重写！");
+	}
+		
+}
+//如果直接父类和接口的方法冲突，优先用父类的方法，可以不进行覆盖重写
+public class MyInterfaceImpl extends Fu implements MyInterface {	
+}
+
+//类是单继承，接口是多继承/如果default方法冲突，要带着default进行方法重写
+public interface MyInterface extends InterfaceA, InterfaceB {
+	public abstract void method();
+}
